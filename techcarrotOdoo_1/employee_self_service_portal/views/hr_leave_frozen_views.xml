@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_allocation_form_frozen" model="ir.ui.view">
+        <field name="name">hr.leave.allocation.form.frozen</field>
+        <field name="model">hr.leave.allocation</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='holiday_status_id']" position="after">
+                <field name="x_type_is_frozen" invisible="1"/>
+                <field name="x_frozen_unlocked"
+                       invisible="not x_type_is_frozen"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
