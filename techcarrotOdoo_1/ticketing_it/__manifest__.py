@@ -4,7 +4,7 @@
     'category': 'Services/Helpdesk',
     'summary': 'IT Support Ticketing System',
     'author': 'TechCarrot FZ-LLC',
-    'depends': ['base', 'hr', 'mail', 'portal', 'web', 'board'],
+    'depends': ['base', 'hr', 'mail', 'portal', 'web', 'board', 'employee_profile_change_request'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

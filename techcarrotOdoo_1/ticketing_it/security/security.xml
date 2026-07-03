@@ -14,13 +14,16 @@
     </record>
 
     <!-- ================================================
-         PORTAL USER: own tickets + line manager + it manager
+         PORTAL USER: own tickets + line manager + it manager + hr approver
     ================================================ -->
     <record id="rule_it_ticket_portal" model="ir.rule">
-        <field name="name">Portal: Own Tickets + Line Manager + IT Manager</field>
+        <field name="name">Portal: Own Tickets + Line Manager + IT Manager + HR Approver</field>
         <field name="model_id" ref="model_it_ticket"/>
-        <field name="domain_force">['|', '|', ('employee_id.user_id', '=', user.id), ('line_manager_id', '=', user.id),
-            ('it_manager_id', '=', user.id)]
+        <field name="domain_force">['|', '|', '|',
+            ('employee_id.user_id', '=', user.id),
+            ('line_manager_id', '=', user.id),
+            ('it_manager_id', '=', user.id),
+            ('hr_approver_id', '=', user.id)]
         </field>
         <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
         <field name="perm_read" eval="True"/>
@@ -63,10 +66,23 @@
     <record id="rule_it_ticket_it_team" model="ir.rule">
         <field name="name">IT Team: Only assigned tickets</field>
         <field name="model_id" ref="model_it_ticket"/>
-        <field name="domain_force">[('assigned_to_id', '=', user.id), ('state', 'in', ['assigned', 'in_progress',
-            'done'])]
-        </field>
+        <field name="domain_force">[('assigned_to_id', '=', user.id), ('state', 'in', ['assigned', 'in_progress', 'done'])]</field>
         <field name="groups" eval="[(4, ref('ticketing_it.group_it_team'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- ================================================
+         HR REVIEWER: sees ONLY tickets pending HR approval
+         Uses existing HR Reviewer group from employee_profile_change_request
+    ================================================ -->
+    <record id="rule_it_ticket_hr_manager" model="ir.rule">
+        <field name="name">HR Reviewer: Only HR approval pending tickets</field>
+        <field name="model_id" ref="model_it_ticket"/>
+        <field name="domain_force">[('state', '=', 'hr_approval'), ('hr_approver_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('employee_profile_change_request.group_profile_change_hr_reviewer'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="False"/>
@@ -84,19 +100,6 @@
         <field name="groups" eval="[(4, ref('ticketing_it.group_it_manager'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-
-
-    <!-- HR Manager: sees tickets pending HR approval -->
-    <record id="rule_it_ticket_hr_manager" model="ir.rule">
-        <field name="name">HR Manager: See all tickets</field>
-        <field name="model_id" ref="model_it_ticket"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4, ref('hr.group_hr_manager'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="False"/>
         <field name="perm_unlink" eval="False"/>
     </record>

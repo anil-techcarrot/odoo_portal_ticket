@@ -241,14 +241,14 @@ class ITTicket(models.Model):
         self.env.cr.execute("""
             SELECT ru.id FROM res_users ru
             JOIN res_groups_users_rel rel ON rel.uid = ru.id
-            WHERE rel.gid = %s AND ru.active = true
+            WHERE rel.gid = %s AND ru.active = true AND ru.share = false
             ORDER BY ru.id LIMIT 1
         """, (grp.id,))
         row = self.env.cr.fetchone()
         return self.env['res.users'].sudo().browse(row[0]) if row else False
 
     def _find_hr_manager(self):
-        grp = self.env.ref('hr.group_hr_manager', raise_if_not_found=False)
+        grp = self.env.ref('employee_profile_change_request.group_profile_change_hr_reviewer', raise_if_not_found=False)
         if not grp:
             return False
         self.env.cr.execute("""
@@ -400,7 +400,7 @@ class ITTicket(models.Model):
 
     def action_hr_approve(self):
         self.ensure_one()
-        if not self.env.user.has_group('hr.group_hr_manager'):
+        if not self.env.user.has_group('employee_profile_change_request.group_profile_change_hr_reviewer'):
             raise UserError(_('Only HR Managers can approve this ticket.'))
         return self.sudo()._open_approve_wizard()
 
@@ -432,7 +432,7 @@ class ITTicket(models.Model):
         user = self.env.user
         if rec.state == 'manager_approval' and user != rec.line_manager_id:
             raise UserError(_('Only the line manager can reject this ticket.'))
-        elif self.state == 'hr_approval' and not user.has_group('hr.group_hr_manager'):
+        elif self.state == 'hr_approval' and not user.has_group('employee_profile_change_request.group_profile_change_hr_reviewer'):
             raise UserError(_('Only HR Managers can reject this ticket.'))
         elif self.state == 'it_approval' and not user.has_group('ticketing_it.group_it_manager'):
             raise UserError(_('Only IT managers can reject this ticket.'))

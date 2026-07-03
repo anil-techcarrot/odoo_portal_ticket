@@ -64,7 +64,7 @@ class ItTicketApproveWizard(models.TransientModel):
                 if not rec.hr_approver_id:
                     rec._compute_hr_approver()
                 # Notify ALL HR managers
-                grp = self.env.ref('hr.group_hr_manager', raise_if_not_found=False)
+                grp = self.env.ref('employee_profile_change_request.group_profile_change_hr_reviewer', raise_if_not_found=False)
                 if grp:
                     self.env.cr.execute("""
                         SELECT ru.id FROM res_users ru
@@ -83,7 +83,7 @@ class ItTicketApproveWizard(models.TransientModel):
 
         # ── HR APPROVAL (level 3) ───────────────────────────────────────────
         elif rec.state == 'hr_approval':
-            if not self.env.user.has_group('hr.group_hr_manager'):
+            if not self.env.user.has_group('employee_profile_change_request.group_profile_change_hr_reviewer'):
                 raise UserError(_('Only HR Managers can approve this ticket.'))
             it_user = rec.assigned_to_id
             if not it_user:
