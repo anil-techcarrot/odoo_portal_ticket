@@ -680,29 +680,29 @@
                             <!-- IT Tickets Card - ADD after Payslips card in Module Cards section -->
                             <div class="col-md-4">
                                 <div class="module-card card border-0 shadow-sm h-100">
-                                    <div class="card-body">
+                                    <div class="card-body d-flex flex-column justify-content-between">
                                         <div class="d-flex align-items-center mb-3">
                                             <div class="icon-circle bg-danger bg-opacity-10 me-3">
                                                 <i class="fa fa-ticket fa-lg text-danger"></i>
                                             </div>
                                             <div>
-                                                <h5 class="mb-1">IT Support</h5>
+                                                <h6 class="mb-1">IT Support</h6>
                                                 <p class="text-muted mb-0 small">Submit and track IT tickets</p>
                                             </div>
                                         </div>
 
                                         <!-- Ticket Stats -->
                                         <div class="ticket-summary mb-3">
-                                            <div class="row text-center">
+                                            <div class="row text-center g-2">
                                                 <div class="col-6">
-                                                    <div class="metric-box">
-                                                        <h4 class="text-danger mb-0" t-esc="it_tickets_count or 0"/>
+                                                    <div class="metric-box bg-danger bg-opacity-10 rounded">
+                                                        <h5 class="text-danger mb-0" t-esc="it_tickets_count or 0"/>
                                                         <small class="text-muted">Total</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
-                                                    <div class="metric-box">
-                                                        <h4 class="text-warning mb-0" t-esc="it_tickets_pending or 0"/>
+                                                    <div class="metric-box bg-warning bg-opacity-10 rounded">
+                                                        <h5 class="text-warning mb-0" t-esc="it_tickets_pending or 0"/>
                                                         <small class="text-muted">Pending</small>
                                                     </div>
                                                 </div>
@@ -712,19 +712,19 @@
                                         <!-- Recent Tickets Preview -->
                                         <t t-if="it_tickets_recent">
                                             <div class="mb-3">
-                                                <t t-foreach="it_tickets_recent" t-as="ticket">
+                                                <t t-foreach="it_tickets_recent[:2]" t-as="ticket">
                                                     <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
-                                                        <small class="text-truncate me-2" style="max-width:140px;">
+                                                        <small class="text-truncate me-2" style="max-width:120px;">
                                                             <t t-esc="ticket.name"/>
                                                             -
                                                             <t t-esc="ticket.subject"/>
                                                         </small>
                                                         <span t-attf-class="badge badge-{{
-                                                            'success' if ticket.state == 'done' else
-                                                            'danger' if ticket.state == 'rejected' else
-                                                            'warning' if ticket.state in ['manager_approval','it_approval'] else
-                                                            'secondary'
-                                                        }} badge-sm" style="font-size:0.65rem;">
+                                'success' if ticket.state == 'done' else
+                                'danger' if ticket.state == 'rejected' else
+                                'warning' if ticket.state in ['manager_approval','it_approval'] else
+                                'secondary'
+                            }} badge-sm" style="font-size:0.65rem;">
                                                             <t t-esc="dict(ticket._fields['state'].selection).get(ticket.state)"/>
                                                         </span>
                                                     </div>
