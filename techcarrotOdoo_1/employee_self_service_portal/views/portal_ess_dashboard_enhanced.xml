@@ -695,17 +695,19 @@
                                         <div class="ticket-summary mb-3">
                                             <div class="row text-center g-2">
                                                 <div class="col-6">
-                                                    <div class="metric-box rounded-3 py-3" style="background:#C0392B;">
+                                                    <div class="metric-box rounded-3 py-3"
+                                                         style="background:linear-gradient(90deg,#1B5E3A,#E58E26);">
                                                         <h4 class="text-white fw-bold mb-0"
                                                             t-esc="it_tickets_count or 0"/>
-                                                        <small class="text-white" style="opacity:0.85;">Total</small>
+                                                        <small class="text-white" style="opacity:0.9;">Total</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
-                                                    <div class="metric-box rounded-3 py-3" style="background:#E58E26;">
+                                                    <div class="metric-box rounded-3 py-3"
+                                                         style="background:linear-gradient(90deg,#E58E26,#C0392B);">
                                                         <h4 class="text-white fw-bold mb-0"
                                                             t-esc="it_tickets_pending or 0"/>
-                                                        <small class="text-white" style="opacity:0.85;">Pending</small>
+                                                        <small class="text-white" style="opacity:0.9;">Pending</small>
                                                     </div>
                                                 </div>
                                             </div>
