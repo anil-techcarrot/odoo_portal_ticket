@@ -678,7 +678,7 @@
 
 
                             <!-- IT Tickets Card - ADD after Payslips card in Module Cards section -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="module-card card border-0 shadow-sm h-100">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center mb-3">
