@@ -23,3 +23,6 @@ access_ticket_it_ticket_type_it_manager,access_it_ticket_type_it_manager,model_i
 access_it_ticket_category_user,it.ticket.category.user,model_it_ticket_category,base.group_user,1,0,0,0
 access_it_ticket_category_portal,it.ticket.category.portal,model_it_ticket_category,base.group_portal,1,0,0,0
 access_it_ticket_category_manager,it.ticket.category.manager,model_it_ticket_category,ticketing_it.group_it_manager,1,1,1,1
+access_it_ticket_hr_reviewer,it.ticket.hr.reviewer,model_it_ticket,employee_profile_change_request.group_profile_change_hr_reviewer,1,1,0,0
+access_it_ticket_approve_wizard_hr_reviewer,it.ticket.approve.wizard.hr.reviewer,model_it_ticket_approve_wizard,employee_profile_change_request.group_profile_change_hr_reviewer,1,1,1,1
+access_it_ticket_reject_wizard_hr_reviewer,it.ticket.reject.wizard.hr.reviewer,model_it_ticket_reject_wizard,employee_profile_change_request.group_profile_change_hr_reviewer,1,1,1,1

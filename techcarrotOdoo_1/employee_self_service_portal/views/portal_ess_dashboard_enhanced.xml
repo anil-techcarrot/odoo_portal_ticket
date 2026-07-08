@@ -15,7 +15,7 @@
                             <span id="currentDate"></span>
                         </p>
                         <!-- Add after the welcome paragraph in the Header Section  -->
-                        <!-- Add after the welcome paragraph in the Header Section  -->
+
                         <t t-if="request.params.get('ticket_success')">
                             <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
                                 <i class="fa fa-check-circle me-2"></i>

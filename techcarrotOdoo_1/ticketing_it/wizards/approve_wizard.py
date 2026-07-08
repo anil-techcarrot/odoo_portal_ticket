@@ -48,11 +48,15 @@ class ItTicketApproveWizard(models.TransientModel):
 
             elif level == '2':
                 # Line Manager → IT Manager
-                rec.with_context(bypass_assignment_check=True).write({'state': 'it_approval'})
-                if not rec.it_manager_id:
-                    mgr = rec._find_it_manager()
-                    if mgr:
-                        rec.sudo().write({'it_manager_id': mgr.id})
+                # Always resolve the CURRENT IT Manager group member here — do not
+                # rely on whatever it_manager_id was set to at ticket creation time,
+                # since group membership can change afterward and a stale value
+                # would silently point to someone no longer in the group.
+                mgr = rec._find_it_manager()
+                if mgr:
+                    rec.sudo().write({'state': 'it_approval', 'it_manager_id': mgr.id})
+                else:
+                    rec.with_context(bypass_assignment_check=True).write({'state': 'it_approval'})
                 if rec.it_manager_id:
                     rec._notify('ticketing_it.email_template_it_approval', rec.it_manager_id)
                 msg = _('✅ Line Manager <b>%s</b> approved → Forwarded to IT Manager: <b>%s</b>') % (
@@ -63,13 +67,13 @@ class ItTicketApproveWizard(models.TransientModel):
                 rec.with_context(bypass_assignment_check=True).write({'state': 'hr_approval'})
                 if not rec.hr_approver_id:
                     rec._compute_hr_approver()
-                # Notify ALL HR managers
+                # Notify ALL HR reviewers
                 grp = self.env.ref('employee_profile_change_request.group_profile_change_hr_reviewer', raise_if_not_found=False)
                 if grp:
                     self.env.cr.execute("""
                         SELECT ru.id FROM res_users ru
                         JOIN res_groups_users_rel rel ON rel.uid = ru.id
-                        WHERE rel.gid = %s AND ru.active = true AND ru.share = false
+                        WHERE rel.gid = %s AND ru.active = true
                     """, (grp.id,))
                     hr_manager_ids = [r[0] for r in self.env.cr.fetchall()]
                     hr_managers = self.env['res.users'].sudo().browse(hr_manager_ids)
