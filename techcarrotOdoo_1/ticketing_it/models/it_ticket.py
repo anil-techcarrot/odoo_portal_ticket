@@ -241,7 +241,7 @@ class ITTicket(models.Model):
         self.env.cr.execute("""
             SELECT ru.id FROM res_users ru
             JOIN res_groups_users_rel rel ON rel.uid = ru.id
-            WHERE rel.gid = %s AND ru.active = true AND ru.share = false
+            WHERE rel.gid = %s AND ru.active = true
             ORDER BY ru.id LIMIT 1
         """, (grp.id,))
         row = self.env.cr.fetchone()
