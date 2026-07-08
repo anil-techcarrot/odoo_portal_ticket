@@ -20,7 +20,22 @@
                             <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
                                 <i class="fa fa-check-circle me-2"></i>
                                 <strong>Ticket submitted successfully!</strong>
-                                Your IT support ticket has been created and sent to your line manager for approval.
+                                <t t-set="routed_to" t-value="request.params.get('ticket_success')"/>
+                                <t t-if="routed_to == 'line_manager'">
+                                    Your IT support ticket has been created and sent to your line manager for approval.
+                                </t>
+                                <t t-elif="routed_to == 'it_manager'">
+                                    Your IT support ticket has been created and sent to your IT Manager for approval.
+                                </t>
+                                <t t-elif="routed_to == 'hr'">
+                                    Your IT support ticket has been created and sent to HR for approval.
+                                </t>
+                                <t t-elif="routed_to == 'it_support'">
+                                    Your IT support ticket has been created and sent directly to IT Support.
+                                </t>
+                                <t t-else="">
+                                    Your IT support ticket has been created successfully.
+                                </t>
                                 <a href="/my/tickets" class="alert-link ms-2">View your tickets →</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
