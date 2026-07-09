@@ -149,8 +149,8 @@
                                     </label>
                                     <input type="text" name="subject" id="subject" class="form-control"
                                            placeholder="Brief description of the issue (e.g. Cannot access email)"
-                                           required="required" maxlength="100"/>
-                                    <div class="form-text">Keep it short and clear (max 100 characters).</div>
+                                           required="required" maxlength="200"/>
+                                    <div class="form-text">Keep it short and clear.</div>
                                 </div>
 
                                 <!-- Description -->
@@ -161,8 +161,8 @@
                                     </label>
                                     <textarea name="description" id="description" class="form-control" rows="5"
                                               placeholder="Describe the issue in detail:&#10;- What happened?&#10;- When did it start?&#10;- What steps did you try?"
-                                              required="required" maxlength="1000"/>
-                                    <div class="form-text">Please provide as much detail as possible (max 1000 characters).</div>
+                                              required="required"/>
+                                    <div class="form-text">Please provide as much detail as possible.</div>
                                 </div>
 
                                 <!-- Attachment -->
@@ -254,18 +254,6 @@
                 <!-- Category → Sub-Category Filter Script -->
                 <script type="text/javascript">
                     <![CDATA[
-                    // Disable past dates on "Required By Date" — today is the earliest selectable day
-                    document.addEventListener('DOMContentLoaded', function () {
-                        var dateInput = document.getElementById('required_date');
-                        if (dateInput) {
-                            var today = new Date();
-                            var yyyy = today.getFullYear();
-                            var mm = String(today.getMonth() + 1).padStart(2, '0');
-                            var dd = String(today.getDate()).padStart(2, '0');
-                            dateInput.setAttribute('min', yyyy + '-' + mm + '-' + dd);
-                        }
-                    });
-
                     // Build a map of category_id → [option elements]
                     var tcSubcatOptions = {};
                     var tcAllOptions = [];
@@ -359,10 +347,9 @@
                     border-radius:6px!important; letter-spacing:0.3px!important; }
                     .tc-label { font-size:13px!important; font-weight:600!important; padding:5px 10px!important;
                     border-radius:5px!important; }
-                    .tc-view-btn { font-size:13px!important; font-weight:600!important; padding:6px 0!important;
+                    .tc-view-btn { font-size:14px!important; font-weight:600!important; padding:10px 0!important;
                     border:2px solid #E8450A!important; color:#E8450A!important; border-radius:6px!important;
-                    background:white!important; transition:all 0.2s ease!important; max-width:160px!important;
-                    margin:0 auto!important; }
+                    background:white!important; transition:all 0.2s ease!important; }
                     .tc-view-btn:hover { background:#E8450A!important; color:white!important; }
                     .tc-ticket-card { border-left:4px solid #2D6A4F!important; transition:box-shadow 0.2s
                     ease!important; }
@@ -477,17 +464,15 @@
                                                 </small>
                                                 <span style="font-size:14px;">
                                                     <i class="fa fa-clock-o me-1" style="color:#E8450A;"/>
-                                                    <t t-esc="ticket.create_date and ticket.create_date.astimezone(pytz.timezone(request.env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')"/>
+                                                    <t t-esc="ticket.create_date.strftime('%Y-%m-%d %H:%M')"/>
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <div class="text-center">
-                                            <a t-attf-href="/my/tickets/{{ticket.id}}" class="btn tc-view-btn">
-                                                <i class="fa fa-eye me-1"/>
-                                                View Details
-                                            </a>
-                                        </div>
+                                        <a t-attf-href="/my/tickets/{{ticket.id}}" class="btn tc-view-btn w-100">
+                                            <i class="fa fa-eye me-1"/>
+                                            View Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>
