@@ -359,10 +359,10 @@
                     border-radius:6px!important; letter-spacing:0.3px!important; }
                     .tc-label { font-size:13px!important; font-weight:600!important; padding:5px 10px!important;
                     border-radius:5px!important; }
-                    .tc-view-btn { font-size:13px!important; font-weight:600!important; padding:6px 0!important;
+                    .tc-view-btn { font-size:13px!important; font-weight:600!important; padding:9px 20px!important;
                     border:2px solid #E8450A!important; color:#E8450A!important; border-radius:6px!important;
-                    background:white!important; transition:all 0.2s ease!important; max-width:160px!important;
-                    margin:0 auto!important; }
+                    background:white!important; transition:all 0.2s ease!important; max-width:180px!important;
+                    margin:0 auto!important; white-space:nowrap!important; }
                     .tc-view-btn:hover { background:#E8450A!important; color:white!important; }
                     .tc-ticket-card { border-left:4px solid #2D6A4F!important; transition:box-shadow 0.2s
                     ease!important; }
@@ -477,7 +477,9 @@
                                                 </small>
                                                 <span style="font-size:14px;">
                                                     <i class="fa fa-clock-o me-1" style="color:#E8450A;"/>
-                                                    <t t-esc="ticket.create_date.strftime('%Y-%m-%d %H:%M') if ticket.create_date else ''"/>
+                                                    <span class="tc-local-time" t-att-data-utc="ticket.create_date and ticket.create_date.isoformat() + 'Z'">
+                                                        <t t-esc="ticket.create_date.strftime('%Y-%m-%d %H:%M') if ticket.create_date else ''"/>
+                                                    </span>
                                                 </span>
                                             </div>
                                         </div>
@@ -510,6 +512,24 @@
                         </div>
                     </div>
                 </t>
+
+                <!-- Convert "Created:" timestamps from UTC to the viewer's own device timezone -->
+                <script type="text/javascript">
+                    <![CDATA[
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.querySelectorAll('.tc-local-time').forEach(function (el) {
+                            var utc = el.getAttribute('data-utc');
+                            if (!utc) return;
+                            var d = new Date(utc);
+                            if (isNaN(d.getTime())) return;
+                            var pad = function (n) { return String(n).padStart(2, '0'); };
+                            var formatted = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+                                + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+                            el.textContent = formatted;
+                        });
+                    });
+                    ]]>
+                </script>
             </div>
         </t>
     </template>
