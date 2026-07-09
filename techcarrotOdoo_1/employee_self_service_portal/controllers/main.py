@@ -1173,7 +1173,7 @@ class PortalEmployee(http.Controller):
         if not post.get('subject') or not post.get('ticket_type_id') or not post.get('description'):
             return request.redirect('/my/ess/tickets/new?error=1&error_msg=Please+fill+all+required+fields')
 
-            # ✅✅✅ ADDED: Required Date Validation
+        # ✅✅✅ ADDED: Required Date Validation
         required_date = post.get('required_date')
         if required_date:
             required_date_obj = fields.Date.from_string(required_date)
@@ -1192,6 +1192,14 @@ class PortalEmployee(http.Controller):
             if ticket_type_id:
                 ticket_type_id = int(ticket_type_id)
 
+            # FIXED: line_manager_id now resolves from employee.line_manager_id ONLY
+            # (no parent_id fallback — parent_id is a different field and should not be used here)
+            resolved_line_manager_id = False
+            if post.get('line_manager_id'):
+                resolved_line_manager_id = int(post['line_manager_id'])
+            elif employee.line_manager_id and employee.line_manager_id.user_id:
+                resolved_line_manager_id = employee.line_manager_id.user_id.id
+
             ticket = request.env['it.ticket'].sudo().create({
                 'employee_id': employee.id,
                 'ticket_type_id': ticket_type_id,
@@ -1200,10 +1208,7 @@ class PortalEmployee(http.Controller):
                 'description': post.get('description'),
                 'required_date': required_date or False,
                 'submitted_date': fields.Datetime.now(),
-                'line_manager_id': (int(post['line_manager_id']) if post.get('line_manager_id') else (
-                    employee.parent_id.user_id.id if employee.parent_id and employee.parent_id.user_id else (
-                        employee.line_manager_id.user_id.id if hasattr(employee,
-                                                                       'line_manager_id') and employee.line_manager_id and employee.line_manager_id.user_id else False))),
+                'line_manager_id': resolved_line_manager_id,
             })
             # ====================================================
             # ✅✅✅ ADDED: ATTACHMENT HANDLING
@@ -1223,7 +1228,11 @@ class PortalEmployee(http.Controller):
                 _logger.info("Attachment %s added to Ticket %s", attachment.filename, ticket.name)
             # ====================================================
             _logger.info("IT Ticket %s created from ESS portal by %s", ticket.name, employee.name)
-            return request.redirect('/my/ess?ticket_success=1')
+
+            # FIXED: routing message now reflects where the ticket actually went,
+            # instead of a hardcoded "1" that always showed "sent to your line manager"
+            routed_to = 'it_support' if ticket.state == 'assigned' else 'line_manager'
+            return request.redirect('/my/ess?ticket_success=%s' % routed_to)
 
         except Exception as e:
             _logger.error("Error creating IT ticket from ESS portal: %s", e)
