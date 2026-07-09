@@ -1173,27 +1173,22 @@ class PortalEmployee(http.Controller):
         if not post.get('subject') or not post.get('ticket_type_id') or not post.get('description'):
             return request.redirect('/my/ess/tickets/new?error=1&error_msg=Please+fill+all+required+fields')
 
-        # ✅✅✅ ADDED: Required Date Validation
         required_date = post.get('required_date')
         if required_date:
             required_date_obj = fields.Date.from_string(required_date)
             today_date = fields.Date.today()
-
             _logger.info("ESS required_date_obj: %s | today: %s", required_date_obj, today_date)
-
             if required_date_obj < today_date:
                 _logger.warning("ESS: Past required_date attempted: %s", required_date_obj)
                 return request.redirect(
                     '/my/ess/tickets/new?error=1&error_msg=Required+Date+cannot+be+in+the+past'
                 )
-        # ✅✅✅ END ADDED VALIDATION
+
         try:
             ticket_type_id = post.get('ticket_type_id')
             if ticket_type_id:
                 ticket_type_id = int(ticket_type_id)
 
-            # FIXED: line_manager_id now resolves from employee.line_manager_id ONLY
-            # (no parent_id fallback — parent_id is a different field and should not be used here)
             resolved_line_manager_id = False
             if post.get('line_manager_id'):
                 resolved_line_manager_id = int(post['line_manager_id'])
@@ -1210,13 +1205,10 @@ class PortalEmployee(http.Controller):
                 'submitted_date': fields.Datetime.now(),
                 'line_manager_id': resolved_line_manager_id,
             })
-            # ====================================================
-            # ✅✅✅ ADDED: ATTACHMENT HANDLING
-            # ====================================================
+
             attachment = request.httprequest.files.get('attachment')
             if attachment and attachment.filename:
                 attachment_content = attachment.read()
-
                 request.env['ir.attachment'].sudo().create({
                     'name': attachment.filename,
                     'type': 'binary',
@@ -1226,11 +1218,14 @@ class PortalEmployee(http.Controller):
                     'mimetype': attachment.mimetype,
                 })
                 _logger.info("Attachment %s added to Ticket %s", attachment.filename, ticket.name)
-            # ====================================================
+
             _logger.info("IT Ticket %s created from ESS portal by %s", ticket.name, employee.name)
 
-            # FIXED: routing message now reflects where the ticket actually went,
-            # instead of a hardcoded "1" that always showed "sent to your line manager"
+            # Message reflects the ticket's ACTUAL first-step state:
+            # - workflow_level '0' -> state becomes 'assigned' at create time -> "IT Support" direct
+            # - workflow_level '1'/'2'/'3' -> state always starts as 'manager_approval' -> "Line Manager"
+            #   (IT Manager and HR are never the FIRST step in this workflow — they only get
+            #    involved after Line Manager approves, so there's no separate branch for them here)
             routed_to = 'it_support' if ticket.state == 'assigned' else 'line_manager'
             return request.redirect('/my/ess?ticket_success=%s' % routed_to)
 
