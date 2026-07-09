@@ -477,7 +477,7 @@
                                                 </small>
                                                 <span style="font-size:14px;">
                                                     <i class="fa fa-clock-o me-1" style="color:#E8450A;"/>
-                                                    <t t-esc="format_datetime(ticket.create_date)"/>
+                                                    <t t-esc="ticket.create_date.strftime('%Y-%m-%d %H:%M') if ticket.create_date else ''"/>
                                                 </span>
                                             </div>
                                         </div>
