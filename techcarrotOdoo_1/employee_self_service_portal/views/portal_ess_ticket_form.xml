@@ -477,7 +477,7 @@
                                                 </small>
                                                 <span style="font-size:14px;">
                                                     <i class="fa fa-clock-o me-1" style="color:#E8450A;"/>
-                                                    <t t-esc="ticket.create_date and ticket.create_date.astimezone(pytz.timezone(request.env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')"/>
+                                                    <t t-esc="format_datetime(ticket.create_date)"/>
                                                 </span>
                                             </div>
                                         </div>
