@@ -516,18 +516,31 @@
                 <!-- Convert "Created:" timestamps from UTC to the viewer's own device timezone -->
                 <script type="text/javascript">
                     <![CDATA[
-                    document.addEventListener('DOMContentLoaded', function () {
-                        document.querySelectorAll('.tc-local-time').forEach(function (el) {
-                            var utc = el.getAttribute('data-utc');
-                            if (!utc) return;
-                            var d = new Date(utc);
-                            if (isNaN(d.getTime())) return;
-                            var pad = function (n) { return String(n).padStart(2, '0'); };
-                            var formatted = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
-                                + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-                            el.textContent = formatted;
-                        });
-                    });
+                    (function () {
+                        function tcConvertLocalTimes() {
+                            document.querySelectorAll('.tc-local-time').forEach(function (el) {
+                                try {
+                                    var utc = el.getAttribute('data-utc');
+                                    if (!utc) return;
+                                    var d = new Date(utc);
+                                    if (isNaN(d.getTime())) return;
+                                    var pad = function (n) { return String(n).padStart(2, '0'); };
+                                    var formatted = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+                                        + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+                                    el.textContent = formatted;
+                                } catch (e) {
+                                    // Don't let one bad element block the rest from converting
+                                    console.error('tc-local-time conversion failed for element', el, e);
+                                }
+                            });
+                        }
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', tcConvertLocalTimes);
+                        } else {
+                            // DOM already parsed (e.g. script loaded late) — run immediately
+                            tcConvertLocalTimes();
+                        }
+                    })();
                     ]]>
                 </script>
             </div>
@@ -622,7 +635,12 @@
                                         <label class="text-muted small">Submitted Date</label>
                                         <p class="mb-0" style="font-size:14px;">
                                             <i class="fa fa-calendar me-1" style="color:#2D6A4F;"/>
-                                            <t t-esc="ticket.submitted_date.strftime('%Y-%m-%d %H:%M') if ticket.submitted_date else 'Not submitted yet'"/>
+                                            <t t-if="ticket.submitted_date">
+                                                <span class="tc-local-time" t-att-data-utc="ticket.submitted_date.isoformat() + 'Z'">
+                                                    <t t-esc="ticket.submitted_date.strftime('%Y-%m-%d %H:%M')"/>
+                                                </span>
+                                            </t>
+                                            <t t-else="">Not submitted yet</t>
                                         </p>
                                     </div>
                                     <t t-if="ticket.required_date">
@@ -779,6 +797,35 @@
                         <i class="fa fa-arrow-left me-2"/>Back to My Tickets
                     </a>
                 </div>
+
+                <!-- Convert timestamps from UTC to the viewer's own device timezone -->
+                <script type="text/javascript">
+                    <![CDATA[
+                    (function () {
+                        function tcConvertLocalTimes() {
+                            document.querySelectorAll('.tc-local-time').forEach(function (el) {
+                                try {
+                                    var utc = el.getAttribute('data-utc');
+                                    if (!utc) return;
+                                    var d = new Date(utc);
+                                    if (isNaN(d.getTime())) return;
+                                    var pad = function (n) { return String(n).padStart(2, '0'); };
+                                    var formatted = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+                                        + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+                                    el.textContent = formatted;
+                                } catch (e) {
+                                    console.error('tc-local-time conversion failed for element', el, e);
+                                }
+                            });
+                        }
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', tcConvertLocalTimes);
+                        } else {
+                            tcConvertLocalTimes();
+                        }
+                    })();
+                    ]]>
+                </script>
             </div>
         </t>
     </template>
