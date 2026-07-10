@@ -15,13 +15,16 @@
 
     <!-- ================================================
          PORTAL USER: own tickets + line manager + it manager
-         (IT Manager branch scoped to Level-2 tickets that have reached his
-         stage, or that he rejected — same logic as the backend rule below)
+         (Line Manager branch excludes Level-0 tickets — he's never part of that
+          flow, even if line_manager_id happens to be populated on the record.
+          IT Manager branch scoped to Level-2 tickets that have reached his
+          stage, or that he rejected — same logic as the backend rule below)
     ================================================ -->
     <record id="rule_it_ticket_portal" model="ir.rule">
         <field name="name">Portal: Own Tickets + Line Manager + IT Manager</field>
         <field name="model_id" ref="model_it_ticket"/>
-        <field name="domain_force">['|', '|', ('employee_id.user_id', '=', user.id), ('line_manager_id', '=', user.id),
+        <field name="domain_force">['|', '|', ('employee_id.user_id', '=', user.id),
+            '&amp;', ('line_manager_id', '=', user.id), ('workflow_level', '!=', '0'),
             '&amp;', '&amp;', ('it_manager_id', '=', user.id), ('workflow_level', '=', '2'),
             '|', ('state', 'in', ['it_approval', 'assigned', 'in_progress', 'done']),
             '&amp;', ('state', '=', 'rejected'), ('rejected_by_id', '=', user.id)]
@@ -34,12 +37,14 @@
     </record>
 
     <!-- ================================================
-         LINE MANAGER (internal): sees their team tickets
+         LINE MANAGER (internal): sees their team tickets at all stages,
+         EXCEPT Level-0 tickets — those never involve him at all, even if
+         line_manager_id got populated on the record.
     ================================================ -->
     <record id="rule_it_ticket_line_manager" model="ir.rule">
         <field name="name">Line Manager: See team tickets at all stages</field>
         <field name="model_id" ref="model_it_ticket"/>
-        <field name="domain_force">[('line_manager_id', '=', user.id)]</field>
+        <field name="domain_force">[('line_manager_id', '=', user.id), ('workflow_level', '!=', '0')]</field>
         <field name="groups" eval="[(4, ref('ticketing_it.group_line_manager'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>

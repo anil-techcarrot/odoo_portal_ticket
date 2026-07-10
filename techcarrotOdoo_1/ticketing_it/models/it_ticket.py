@@ -254,7 +254,7 @@ class ITTicket(models.Model):
         self.env.cr.execute("""
             SELECT ru.id FROM res_users ru
             JOIN res_groups_users_rel rel ON rel.uid = ru.id
-            WHERE rel.gid = %s AND ru.active = true AND ru.share = false
+            WHERE rel.gid = %s AND ru.active = true
             ORDER BY ru.id LIMIT 1
         """, (grp.id,))
         row = self.env.cr.fetchone()
@@ -296,13 +296,12 @@ class ITTicket(models.Model):
             vals['submitted_date'] = fields.Date.today()
 
             # Auto-resolve line_manager_id from employee if not explicitly passed
-            if not vals.get('line_manager_id') and vals.get('employee_id'):
+            # (skip entirely for Level 0 — Line Manager is not part of that flow at all)
+            if level != '0' and not vals.get('line_manager_id') and vals.get('employee_id'):
                 emp = self.env['hr.employee'].sudo().browse(vals['employee_id'])
                 if emp:
-                    if hasattr(emp, 'line_manager_id') and emp.line_manager_id and emp.line_manager_id.user_id:
+                    if emp.line_manager_id and emp.line_manager_id.user_id:
                         vals['line_manager_id'] = emp.line_manager_id.user_id.id
-                    elif emp.parent_id and emp.parent_id.user_id:
-                        vals['line_manager_id'] = emp.parent_id.user_id.id
 
             if level == '0':
                 # Direct to IT Support
