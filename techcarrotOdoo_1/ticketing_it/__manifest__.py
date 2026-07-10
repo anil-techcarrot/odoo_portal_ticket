@@ -14,6 +14,7 @@
         'data/automated_actions.xml',
         'data/ticket_categories_and_types.xml',
         'data/ticket_type.xml',
+        'data/server_action.xml',
         'views/portal_ticket_detail.xml',
         'views/portal_it_ticket_approvals.xml',
         'views/portal_my_home_link.xml',
