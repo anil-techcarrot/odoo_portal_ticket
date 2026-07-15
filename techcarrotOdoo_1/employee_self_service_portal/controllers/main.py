@@ -3567,7 +3567,8 @@ class PortalEmployee(http.Controller):
         try:
             if 'industry_id' in all_user_leads._fields:
                 # Get ALL industries available in the system
-                industries = request.env['res.partner.industry'].sudo().search([], order='name')
+                industries = request.env['crm.industry'].sudo().search([('active', '=', True)], order='name')
+                # industries = request.env['res.partner.industry'].sudo().search([], order='name')
         except Exception:
             industries = []
 

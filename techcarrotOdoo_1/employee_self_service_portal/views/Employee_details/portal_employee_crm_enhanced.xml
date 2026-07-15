@@ -557,11 +557,13 @@
           
           // Action Functions
           function addActivity(leadId) {
-            window.location.href = `/my/employee/crm/activity/modal/${leadId}/add`;
+            window.location.href = `/my/employee/crm/activity_modal/${leadId}/add`;
+<!--            window.location.href = `/my/employee/crm/activity/modal/${leadId}/add`;-->
           }
           
           function addNote(leadId) {
-            window.location.href = `/my/employee/crm/notes/modal/${leadId}`;
+            window.location.href = `/my/employee/crm/notes_modal/${leadId}`;
+<!--            window.location.href = `/my/employee/crm/notes/modal/${leadId}`;-->
           }
           
           function duplicateLead(leadId) {
