@@ -612,44 +612,44 @@
 
                     // Action Functions
 
-                    function addActivity(leadId) {
-                    fetch(`/my/employee/crm/activity_modal/${leadId}/add`)
-                    .then(r => r.text())
-                    .then(html => {
-                    let c = document.getElementById('dynamicModalContainer');
-                    if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';
-                    document.body.appendChild(c); }
-                    c.innerHTML = html;
-                    const modalEl = c.querySelector('.modal');
-                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }
-                    else { console.error('No .modal element in response:', html); }
-                    })
-                    .catch(err => { console.error(err); alert('Unable to load activity form.'); });
-                    }
+<!--                    function addActivity(leadId) {-->
+<!--                    fetch(`/my/employee/crm/activity_modal/${leadId}/add`)-->
+<!--                    .then(r => r.text())-->
+<!--                    .then(html => {-->
+<!--                    let c = document.getElementById('dynamicModalContainer');-->
+<!--                    if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';-->
+<!--                    document.body.appendChild(c); }-->
+<!--                    c.innerHTML = html;-->
+<!--                    const modalEl = c.querySelector('.modal');-->
+<!--                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }-->
+<!--                    else { console.error('No .modal element in response:', html); }-->
+<!--                    })-->
+<!--                    .catch(err => { console.error(err); alert('Unable to load activity form.'); });-->
+<!--                    }-->
 
-                    function addNote(leadId) {
-                    fetch(`/my/employee/crm/notes_modal/${leadId}`)
-                    .then(r => r.text())
-                    .then(html => {
-                    let c = document.getElementById('dynamicModalContainer');
-                    if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';
-                    document.body.appendChild(c); }
-                    c.innerHTML = html;
-                    const modalEl = c.querySelector('.modal');
-                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }
-                    else { console.error('No .modal element in response:', html); }
-                    })
-                    .catch(err => { console.error(err); alert('Unable to load notes.'); });
-                    }
-                    <!--          function addActivity(leadId) {-->
-                    <!--            window.location.href = `/my/employee/crm/activity_modal/${leadId}/add`;-->
-                    <!--&lt;!&ndash;            window.location.href = `/my/employee/crm/activity/modal/${leadId}/add`;&ndash;&gt;-->
-                    <!--          }-->
-                    <!--          -->
-                    <!--          function addNote(leadId) {-->
-                    <!--            window.location.href = `/my/employee/crm/notes_modal/${leadId}`;-->
-                    <!--&lt;!&ndash;            window.location.href = `/my/employee/crm/notes/modal/${leadId}`;&ndash;&gt;-->
-                    <!--          }-->
+<!--                    function addNote(leadId) {-->
+<!--                    fetch(`/my/employee/crm/notes_modal/${leadId}`)-->
+<!--                    .then(r => r.text())-->
+<!--                    .then(html => {-->
+<!--                    let c = document.getElementById('dynamicModalContainer');-->
+<!--                    if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';-->
+<!--                    document.body.appendChild(c); }-->
+<!--                    c.innerHTML = html;-->
+<!--                    const modalEl = c.querySelector('.modal');-->
+<!--                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }-->
+<!--                    else { console.error('No .modal element in response:', html); }-->
+<!--                    })-->
+<!--                    .catch(err => { console.error(err); alert('Unable to load notes.'); });-->
+<!--                    }-->
+                              function addActivity(leadId) {
+                                window.location.href = `/my/employee/crm/activity_modal/${leadId}/add`;
+                    <!--            window.location.href = `/my/employee/crm/activity/modal/${leadId}/add`;-->
+                              }
+
+                              function addNote(leadId) {
+                                window.location.href = `/my/employee/crm/notes_modal/${leadId}`;
+                    <!--            window.location.href = `/my/employee/crm/notes/modal/${leadId}`;-->
+                              }
 
                     function duplicateLead(leadId) {
                     if (confirm('Are you sure you want to duplicate this lead?')) {
