@@ -612,33 +612,58 @@
 
                     // Action Functions
 
-                    function addActivity(leadId) {
-                    fetch(`/my/employee/crm/activity_modal/${leadId}/add`)
-                    .then(r => r.text())
-                    .then(html => {
+                    // ADDED: manual modal open/close helpers - do NOT depend on
+                    // window.bootstrap being defined on this page (that was the
+                    // cause of the "Unable to load activity/notes form" alerts).
+                    function openDynamicModal(html) {
                     let c = document.getElementById('dynamicModalContainer');
                     if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';
                     document.body.appendChild(c); }
                     c.innerHTML = html;
+
                     const modalEl = c.querySelector('.modal');
-                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }
-                    else { console.error('No .modal element in response:', html); }
-                    })
+                    if (!modalEl) {
+                    console.error('No .modal element in response:', html);
+                    alert('Form could not be loaded. Please contact support.');
+                    return;
+                    }
+
+                    modalEl.classList.add('show');
+                    modalEl.style.display = 'block';
+                    document.body.classList.add('modal-open');
+
+                    let backdrop = document.getElementById('dynamicModalBackdrop');
+                    if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.id = 'dynamicModalBackdrop';
+                    backdrop.className = 'modal-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                    }
+
+                    modalEl.querySelectorAll('[data-bs-dismiss="modal"], .btn-close').forEach(function (btn) {
+                    btn.addEventListener('click', closeDynamicModal);
+                    });
+                    }
+
+                    function closeDynamicModal() {
+                    const c = document.getElementById('dynamicModalContainer');
+                    if (c) c.innerHTML = '';
+                    const backdrop = document.getElementById('dynamicModalBackdrop');
+                    if (backdrop) backdrop.remove();
+                    document.body.classList.remove('modal-open');
+                    }
+
+                    function addActivity(leadId) {
+                    fetch(`/my/employee/crm/activity_modal/${leadId}/add`)
+                    .then(r => r.text())
+                    .then(openDynamicModal)
                     .catch(err => { console.error(err); alert('Unable to load activity form.'); });
                     }
 
                     function addNote(leadId) {
                     fetch(`/my/employee/crm/notes_modal/${leadId}`)
                     .then(r => r.text())
-                    .then(html => {
-                    let c = document.getElementById('dynamicModalContainer');
-                    if (!c) { c = document.createElement('div'); c.id = 'dynamicModalContainer';
-                    document.body.appendChild(c); }
-                    c.innerHTML = html;
-                    const modalEl = c.querySelector('.modal');
-                    if (modalEl) { new bootstrap.Modal(modalEl).show(); }
-                    else { console.error('No .modal element in response:', html); }
-                    })
+                    .then(openDynamicModal)
                     .catch(err => { console.error(err); alert('Unable to load notes.'); });
                     }
                     <!--                              function addActivity(leadId) {-->
