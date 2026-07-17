@@ -18,11 +18,18 @@ class ItTicketApproveWizard(models.TransientModel):
         _logger.info('APPROVAL: ticket=%s state=%s level=%s user=%s',
                      rec.name, rec.state, rec.workflow_level, self.env.user.name)
 
+        # Remember which role is acting, so we know where it's safe to redirect
+        # afterward — some roles (e.g. HR) lose read access to the ticket the
+        # instant it leaves their stage, so we must not try to reload the same
+        # record's form view after approval or Odoo throws an Access Error.
+        acting_role = None
+
         # ── LINE MANAGER APPROVAL ───────────────────────────────────────────
         if rec.state == 'manager_approval':
             if self.env.user != rec.line_manager_id:
                 raise UserError(_('Only the Line Manager (%s) can approve this ticket.')
                                  % (rec.line_manager_id.name or '?'))
+            acting_role = 'line_manager'
 
             if self.comment:
                 rec.sudo().write({'manager_remarks': self.comment})
@@ -89,6 +96,7 @@ class ItTicketApproveWizard(models.TransientModel):
         elif rec.state == 'hr_approval':
             if not self.env.user.has_group('employee_profile_change_request.group_profile_change_hr_reviewer'):
                 raise UserError(_('Only HR Managers can approve this ticket.'))
+            acting_role = 'hr'
             it_user = rec.assigned_to_id
             if not it_user:
                 grp = self.env.ref('ticketing_it.group_it_team', raise_if_not_found=False)
@@ -109,6 +117,7 @@ class ItTicketApproveWizard(models.TransientModel):
         elif rec.state == 'it_approval':
             if not self.env.user.has_group('ticketing_it.group_it_manager'):
                 raise UserError(_('Only IT Managers can approve this ticket.'))
+            acting_role = 'it_manager'
 
             if self.comment:
                 rec.sudo().write({'it_manager_remarks': self.comment})
@@ -139,4 +148,24 @@ class ItTicketApproveWizard(models.TransientModel):
                          author_id=self.env.user.partner_id.id,
                          subtype_xmlid='mail.mt_comment')
         _logger.info('APPROVAL DONE: ticket=%s new_state=%s', rec.name, rec.state)
+
+        # ── SAFE REDIRECT ────────────────────────────────────────────────────
+        # HR loses read access to the ticket the instant it leaves 'hr_approval'
+        # (by design — HR only sees pending items). If we just close the wizard,
+        # Odoo tries to re-render the ticket form behind it and throws an Access
+        # Error, even though the approval itself succeeded. So for HR specifically,
+        # redirect back to the "Pending HR Approval" list instead of the record.
+        if acting_role == 'hr':
+            action = self.env.ref('ticketing_it.action_it_ticket_pending_hr_approval', raise_if_not_found=False)
+            if action:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': action.name,
+                    'res_model': 'it.ticket',
+                    'view_mode': 'list,form',
+                    'views': [(False, 'list'), (False, 'form')],
+                    'domain': [('state', '=', 'hr_approval')],
+                    'target': 'main',
+                }
+
         return {'type': 'ir.actions.act_window_close'}
